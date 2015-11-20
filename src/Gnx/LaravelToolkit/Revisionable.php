@@ -164,7 +164,7 @@ class Revisionable extends Eloquent
                 }
 
                 $revisions[] = array(
-                    'revisionable_type'     => get_class($this),
+                    'revisionable_type'     => $this->getTable(),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
                     'old_value'             => array_get($this->originalData, $key),
@@ -177,7 +177,7 @@ class Revisionable extends Eloquent
 
             if ($creating && !$foundCreatedAt) {
                 $revisions[] = array(
-                    'revisionable_type' => get_class($this),
+                    'revisionable_type' => $this->getTable(),
                     'revisionable_id' => $this->getKey(),
                     'key' => 'created_at',
                     'old_value' => null,
@@ -210,7 +210,7 @@ class Revisionable extends Eloquent
             && $this->isSoftDelete()
             && $this->isRevisionable('deleted_at')) {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->getTable(),
                 'revisionable_id' => $this->getKey(),
                 'key' => 'deleted_at',
                 'old_value' => null,

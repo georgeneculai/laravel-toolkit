@@ -189,7 +189,7 @@ trait RevisionableTrait
                 }
 
                 $revisions[] = array(
-                    'revisionable_type' => get_class($this),
+                    'revisionable_type' => $this->getTable(),
                     'revisionable_id' => $this->getKey(),
                     'key' => $key,
                     'old_value' => $creating ? null : array_get($this->originalData, $key),
@@ -202,7 +202,7 @@ trait RevisionableTrait
 
             if ($creating && !$foundCreatedAt) {
                 $revisions[] = array(
-                    'revisionable_type' => get_class($this),
+                    'revisionable_type' => $this->getTable(),
                     'revisionable_id' => $this->getKey(),
                     'key' => 'created_at',
                     'old_value' => null,
@@ -236,7 +236,7 @@ trait RevisionableTrait
             && $this->isRevisionable('deleted_at')
         ) {
             $revisions[] = array(
-                'revisionable_type' => get_class($this),
+                'revisionable_type' => $this->getTable(),
                 'revisionable_id' => $this->getKey(),
                 'key' => 'deleted_at',
                 'old_value' => null,
