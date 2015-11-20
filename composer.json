@@ -1,0 +1,29 @@
+{
+    "name": "gnx/laravel-toolkit",
+    "license": "MIT",
+    "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel",
+    "keywords": ["model", "laravel", "ardent", "revision", "history"],
+    "homepage": "http://github.com/gnx/laravel-toolkit",
+    "authors": [
+        {
+            "name": "George Neculai",
+            "email": "george.neculai@yahoo.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/gnx/laravel-toolkit/issues",
+        "source": "https://github.com/gnx/laravel-toolkit"
+    },
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "~4.0|~5.0|~5.1"
+    },
+    "autoload": {
+        "classmap": [
+            "src/migrations"
+        ],
+        "psr-0": {
+            "Gnx\\LaravelToolkit": "src/"
+        }
+    }
+}
