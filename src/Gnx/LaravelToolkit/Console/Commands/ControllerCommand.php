@@ -148,7 +148,10 @@ class ControllerCommand extends GeneratorCommand
         $modelns = $this->option('modelns') ? $this->option('modelns') : $this->argument('modelns');
 
 
-        return str_replace('DummyModelNamespace', strlen($modelns) ? $modelns : ($this->laravel->getNamespace() . 'Models'), $stub);
+        $stub = str_replace('DummyAppNamespace', $this->laravel->getNamespace(), $stub);
+        $stub = str_replace('DummyModelNamespace', strlen($modelns) ? $modelns : ($this->laravel->getNamespace() . 'Models'), $stub);
+
+        return $stub;
     }
 
     /**
