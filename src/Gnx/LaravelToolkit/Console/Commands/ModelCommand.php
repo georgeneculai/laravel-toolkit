@@ -48,9 +48,26 @@ class ModelCommand extends GeneratorCommand
         if (parent::fire() !== false) {
             if (!$this->option('no-migration')) {
                 $table = $this->getTableInput();
-                $this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
+
+                $path = $this->laravel->databasePath().'/migrations/' . date('Y_m_d_His') . '_create_' . $table . '_table.php';
+                $stub = $this->buildMigration($table);
+
+                $this->files->put($path, $stub);
+                $file = pathinfo($path, PATHINFO_FILENAME);
+                $this->line("<info>Created Migration:</info> $file");
+
+                //$this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
             }
         }
+    }
+
+    /**
+     * Get the stub directory
+     *
+     * @return string
+     */
+    public function getStubDir() {
+        return __DIR__.'/../stubs';
     }
 
     /**
@@ -60,7 +77,7 @@ class ModelCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/../stubs/model.stub';
+        return $this->getStubDir() . '/model.stub';
     }
 
     /**
@@ -88,19 +105,35 @@ class ModelCommand extends GeneratorCommand
 
         $stub = $this->replaceNamespace($stub, $name)
                 ->replaceClass($stub, $name);
-        return $this->replaceTable($stub, $name);
+        return $this->replaceTable($stub);
+    }
+
+    /**
+     * Build the migration class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildMigration($table)
+    {
+        $stub = $this->files->get($this->getStubDir() . '/create.stub');
+
+        $stub = $this->replaceClass($stub, Str::studly('create ' . $table . ' table'));
+        return $this->replaceTable($stub, $table);
     }
 
     /**
      * Replace the table name for the given stub.
      *
      * @param  string  $stub
-     * @param  string  $name
+     * @param  string  $table
      * @return string
      */
-    protected function replaceTable($stub, $name)
+    protected function replaceTable($stub, $table = null)
     {
-        $table = $this->getTableInput();
+        if ($table === null) {
+            $table = $this->getTableInput();
+        }
 
         return str_replace('DummyTable', $table, $stub);
     }
