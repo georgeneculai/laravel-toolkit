@@ -18,11 +18,12 @@ class ModelCommand extends GeneratorCommand
      */
     protected $signature = 'laravel-toolkit:model
                             {model : Model name singular (will assume table is plural)}
-                            {table? : Table name }
+                            {table? : Table name (optional)}
                             {--model= : Model name singular (will assume table is plural}
                             {--table= : Table name}
                             {--dir= : The directory}
-                            {--no-migration : Do not create a migration file}';
+                            {--no-migration : Do not create a migration file}
+                            {--run-migration : Run the migration file}';
 
     /**
      * The console command description.
@@ -57,6 +58,9 @@ class ModelCommand extends GeneratorCommand
                 $this->line("<info>Created Migration:</info> $file");
 
                 //$this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
+                if ($this->option('run-migration') ? $this->option('run-migration') : $this->argument('run-migration')) {
+                    $this->call('migrate');
+                }
             }
         }
     }
@@ -88,9 +92,13 @@ class ModelCommand extends GeneratorCommand
     protected function getNameInput()
     {
         $model = $this->option('model') ? $this->option('model') : $this->argument('model');
-        $dir = $this->option('dir');
 
-        return ($dir ? $dir : 'Models/') . $model;
+        $dir = $this->option('dir');
+        if (strlen($dir) && !Str::endsWith($dir, DIRECTORY_SEPARATOR)) {
+            $dir .= DIRECTORY_SEPARATOR;
+        }
+
+        return (strlen($dir) ? $dir : 'Models/') . $model;
     }
 
     /**

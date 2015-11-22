@@ -64,7 +64,7 @@ If you are using another bootable trait the be sure to override the boot method 
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use \Gnx\LaravelToolkit\RevisionableTrait;
+    use \Gnx\LaravelToolkit\Models\RevisionableTrait;
 
     public static function boot()
     {
@@ -84,7 +84,7 @@ class Article extends Eloquent {
 For any model that you want to keep a revision history for, include the revisionable namespace and extend revisionable instead of eloquent, e.g.,
 
 ```php
-use Gnx\LaravelToolkit\Revisionable;
+use Gnx\LaravelToolkit\Models\Revisionable;
 
 namespace MyApp\Models;
 
@@ -101,7 +101,7 @@ If needed, you can disable the revisioning by setting `$revisionEnabled` to fals
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use Gnx\LaravelToolkit\RevisionableTrait;
+    use Gnx\LaravelToolkit\Models\RevisionableTrait;
 
     protected $revisionEnabled = false;
 }
@@ -113,7 +113,7 @@ You can also disable revisioning after X many revisions have been made by settin
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use Gnx\LaravelToolkit\RevisionableTrait;
+    use Gnx\LaravelToolkit\Models\RevisionableTrait;
 
     protected $revisionEnabled = true;
     protected $historyLimit = 500; //Stop tracking revisions after 500 changes have been made.
@@ -125,7 +125,7 @@ In order to maintain a limit on history, but instead of stopping tracking revisi
 namespace MyApp\Models;
 
 class Article extends Eloquent {
-    use Gnx\LaravelToolkit\RevisionableTrait;
+    use Gnx\LaravelToolkit\Models\RevisionableTrait;
 
     protected $revisionEnabled = true;
     protected $revisionCleanup = true; //Remove old revisions (works only when used with $historyLimit)
@@ -290,7 +290,7 @@ This is used when the value (old or new) is the id of a foreign key relationship
 By default, it simply returns the ID of the model that was updated. It is up to you to override this method in your own models to return something meaningful. e.g.,
 
 ```php
-use Gnx\LaravelToolkit\Revisionable;
+use Gnx\LaravelToolkit\Models\Revisionable;
 
 class Article extends Revisionable
 {
@@ -335,13 +335,27 @@ Usage:
 
 Arguments:
   model                 Model name singular (will assume table is plural)
-  table                 Table name
+  table                 Table name (optional)
 
 Options:
       --model[=MODEL]   Model name singular (will assume table is plural
       --table[=TABLE]   Table name
       --dir[=DIR]       The directory
       --no-migration    Do not create a migration file
+      --run-migration   Run the migration file
+
+## The controller command - Generate a Laravel controller with API support
+Arguments:
+  controller                     Controller name
+  model                          Model name
+  modelns                        Model name space (optional)
+
+Options:
+      --controller[=CONTROLLER]  Controller name
+      --model[=MODEL]            Model name
+      --modelns[=MODELNS]        Model name space
+      --dir[=DIR]                The directory
+      --no-routes                Do not append the routes
 
 <a name="contributing"></a>
 ## Contributing

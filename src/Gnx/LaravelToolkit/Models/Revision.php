@@ -1,8 +1,9 @@
 <?php
-namespace Gnx\LaravelToolkit;
+namespace Gnx\LaravelToolkit\Models;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Log;
+use Gnx\LaravelToolkit\Utils\FieldFormatter;
 
 /**
  * Revision.

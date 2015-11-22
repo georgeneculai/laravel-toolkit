@@ -1,5 +1,5 @@
 <?php
-namespace Gnx\LaravelToolkit;
+namespace Gnx\LaravelToolkit\Models;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
@@ -83,6 +83,13 @@ class Revisionable extends Eloquent
             $model->preSave();
             $model->postDelete();
         });
+
+        static::restoring(function ($model) {
+            if ($model->isSoftDelete()) {
+                $model->deleted_by = 0;
+                // no need to save - it is done in the SoftDelete trait
+            }
+        });
     }
 
     /**
@@ -90,7 +97,7 @@ class Revisionable extends Eloquent
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Gnx\LaravelToolkit\Revision', 'revisionable');
+        return $this->morphMany('Revision', 'revisionable');
     }
 
     /**
@@ -258,7 +265,7 @@ class Revisionable extends Eloquent
                 'user_id' => $this->getUserId(),
                 'created_at' => new \DateTime()
             );
-            $revision = new \Gnx\LaravelToolkit\Revision;
+            $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
     }

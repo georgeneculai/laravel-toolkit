@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DummyClass extends Model
 {
-    use \Gnx\LaravelToolkit\RevisionableTrait;
+    use \Gnx\LaravelToolkit\Models\RevisionableTrait;
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
     /**
@@ -15,4 +15,11 @@ class DummyClass extends Model
      * @var string
      */
     protected $table = 'DummyTable';
+
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = ['created_by', 'updated_by', 'deleted_by', 'deleted_at'];
 }

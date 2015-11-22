@@ -1,5 +1,5 @@
 <?php
-namespace Gnx\LaravelToolkit;
+namespace Gnx\LaravelToolkit\Utils;
 
 /**
  * FieldFormatter.

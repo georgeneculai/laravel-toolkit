@@ -1,4 +1,4 @@
-<?php namespace Gnx\LaravelToolkit;
+<?php namespace Gnx\LaravelToolkit\Models;
 
 /*
  * This file is part of the LaravelToolkit package by Gnx
@@ -93,6 +93,13 @@ trait RevisionableTrait
             $model->preSave();
             $model->postDelete();
         });
+
+        static::restoring(function ($model) {
+            if ($model->isSoftDelete()) {
+                $model->deleted_by = 0;
+                // no need to save - it is done in the SoftDelete trait
+            }
+        });
     }
 
     /**
@@ -100,7 +107,7 @@ trait RevisionableTrait
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Gnx\LaravelToolkit\Revision', 'revisionable');
+        return $this->morphMany('Revision', 'revisionable');
     }
 
     /**
@@ -112,7 +119,7 @@ trait RevisionableTrait
      */
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
-        return \Gnx\LaravelToolkit\Revision::where('revisionable_type', get_called_class())
+        return Revision::where('revisionable_type', get_called_class())
             ->orderBy('created_at', $order)->limit($limit)->get();
     }
 
@@ -185,10 +192,7 @@ trait RevisionableTrait
             $RevisionCleanup=false;
         }
 
-        // check if the model already exists
         if (((!isset($this->revisionEnabled) || $this->revisionEnabled) && ($creating || $this->updating)) && (!$LimitReached || $RevisionCleanup)) {
-            // if it does, it means we're updating
-
             $changes_to_record = $this->changedRevisionableFields();
 
             $revisions = array();
@@ -284,7 +288,7 @@ trait RevisionableTrait
                 'created_at' => new \DateTime()
             );
 
-            $revision = new \Gnx\LaravelToolkit\Revision;
+            $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
     }
