@@ -1,0 +1,18 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Database\Eloquent\Model;
+
+class DummyClass extends Model
+{
+    use \Gnx\LaravelToolkit\RevisionableTrait;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'DummyTable';
+}

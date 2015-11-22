@@ -326,6 +326,23 @@ or:
 $object->disableRevisionField(array('title', 'content')); // Disables title and content
 ```
 
+## Console commands
+You can use console commands if you add the Gnx\LaravelToolkit\LaravelToolkitServiceProvider::class service provider in your config/app.php providers key.
+
+## The model command - Generate a Laravel model within the Models folder and with revision support
+Usage:
+  laravel-toolkit:model [options] [--] <model> [<table>]
+
+Arguments:
+  model                 Model name singular (will assume table is plural)
+  table                 Table name
+
+Options:
+      --model[=MODEL]   Model name singular (will assume table is plural
+      --table[=TABLE]   Table name
+      --dir[=DIR]       The directory
+      --no-migration    Do not create a migration file
+
 <a name="contributing"></a>
 ## Contributing
 

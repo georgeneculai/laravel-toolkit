@@ -39,13 +39,13 @@ class LaravelToolkitServiceProvider extends ServiceProvider
     {
         $this->app['command.laravel-toolkit.model'] = $this->app->share(
             function ($app) {
-                return new ModelCommand($app['config'], $app['files'], $app['view']);
+                return new ModelCommand($app['files']);
             }
         );
 
         $this->app['command.laravel-toolkit.controller'] = $this->app->share(
             function ($app) {
-                return new ControllerCommand($app['config'], $app['files'], $app['view']);
+                return new ControllerCommand($app['files']);
             }
         );
 
