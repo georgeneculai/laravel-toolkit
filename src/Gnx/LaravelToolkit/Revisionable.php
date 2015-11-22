@@ -1,4 +1,5 @@
-<?php namespace Gnx\LaravelToolkit;
+<?php
+namespace Gnx\LaravelToolkit;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
@@ -7,10 +8,6 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  *
  */
 
-/**
- * Class Revisionable
- * @package Gnx\LaravelToolkit
- */
 class Revisionable extends Eloquent
 {
     /**

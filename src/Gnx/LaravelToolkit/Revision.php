@@ -1,5 +1,4 @@
 <?php
-
 namespace Gnx\LaravelToolkit;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -7,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Revision.
+ * This file is part of the LaravelToolkit package by Gnx
  *
  * Base model to allow for revision history on
  * any model that extends this model

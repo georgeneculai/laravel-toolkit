@@ -5,10 +5,6 @@
  *
  */
 
-/**
- * Class RevisionableTrait
- * @package Gnx\LaravelToolkit
- */
 trait RevisionableTrait
 {
     /**

@@ -1,16 +1,11 @@
 <?php
-
 namespace Gnx\LaravelToolkit;
 
 /**
  * FieldFormatter.
+ * This file is part of the LaravelToolkit package by Gnx
  *
  * Allows formatting of fields
- */
-
-/**
- * Class FieldFormatter
- * @package Gnx\LaravelToolkit
  */
 class FieldFormatter
 {
