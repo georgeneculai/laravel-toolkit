@@ -8,8 +8,6 @@ Revisionable: It is possible to have a revision history for any model in your pr
 
 So not only can you see a history of what happened, but who did what, so there's accountability.
 
-Revisionable is a laravel package that allows you to keep a revision history for your models without thinking. For some background and info, [see this article](http://www.chrisduell.com/blog/development/keeping-revisions-of-your-laravel-model-data/)
-
 ## Working with 3rd party Auth / Eloquent extensions
 
 Revisionable has support for Auth powered by
@@ -42,7 +40,7 @@ php artisan migrate --path=vendor/gnx/laravel-toolkit/src/migrations
 
 > If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
 
-> `cp vendor/gnx/laravel-toolkit/src/migrations/2013_04_09_062329_create_revisions_table.php app/database/migrations/`
+> `cp vendor/gnx/laravel-toolkit/src/migrations/2015_11_20_000000_create_revisions_table.php app/database/migrations/`
 
 ## Docs
 

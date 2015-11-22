@@ -13,15 +13,13 @@ class CreateRevisionsTable extends Migration
     {
         Schema::create('revisions', function ($table) {
             $table->increments('id');
-            $table->string('revisionable_type');
-            $table->integer('revisionable_id')->unsigned();
-            $table->integer('user_id')->unsigned()->nullable();
-            $table->string('key');
+            $table->string('revisionable_type')->index();
+            $table->integer('revisionable_id')->unsigned()->index();
+            $table->integer('user_id')->unsigned()->nullable()->index();
+            $table->string('key')->index();
             $table->text('old_value')->nullable();
             $table->text('new_value')->nullable();
-            $table->timestamps();
-
-            $table->index(array('revisionable_id', 'revisionable_type'));
+            $table->timestamp('created_at')->index();
         });
     }
 

@@ -55,6 +55,11 @@ class Revisionable extends Eloquent
         parent::boot();
 
         static::saving(function ($model) {
+            if ($model->exists) {
+                $model->updated_by = $model->getUserId();
+            } else {
+                $model->created_by = $model->getUserId();
+            }
             $model->preSave();
         });
 
@@ -62,8 +67,19 @@ class Revisionable extends Eloquent
             $model->postSave();
         });
 
+        static::creating(function($model){
+            $model->created_by = $model->getUserId();
+        });
+
         static::created(function($model){
             $model->postSave(true);
+        });
+
+        static::deleting(function ($model) {
+            if ($model->isSoftDelete()) {
+                $model->deleted_by = $model->getUserId();
+                $model->save();
+            }
         });
 
         static::deleted(function ($model) {
@@ -157,21 +173,35 @@ class Revisionable extends Eloquent
             $revisions = array();
 
             $foundCreatedAt = false;
+            $foundUpdatedAt = false;
+            $foundDeletedAt = false;
+            $foundDeletedBy = false;
 
             foreach ($changes_to_record as $key => $change) {
                 if ($key == 'created_at') {
                     $foundCreatedAt = true;
                 }
 
+                if ($key == 'updated_at') {
+                    $foundUpdatedAt = true;
+                }
+
+                if ($key == 'deleted_at') {
+                    $foundDeletedAt = true;
+                }
+
+                if ($key == 'deleted_by') {
+                    $foundDeletedBy = true;
+                }
+
                 $revisions[] = array(
                     'revisionable_type'     => $this->getTable(),
                     'revisionable_id'       => $this->getKey(),
                     'key'                   => $key,
-                    'old_value'             => array_get($this->originalData, $key),
-                    'new_value'             => $creating ? null : $this->updatedData[$key],
+                    'old_value'             => $creating ? null : array_get($this->originalData, $key),
+                    'new_value'             => $this->updatedData[$key],
                     'user_id'               => $this->getUserId(),
-                    'created_at'            => new \DateTime(),
-                    'updated_at'            => new \DateTime(),
+                    'created_at'            => new \DateTime()
                 );
             }
 
@@ -183,8 +213,19 @@ class Revisionable extends Eloquent
                     'old_value' => null,
                     'new_value' => $this->created_at,
                     'user_id' => $this->getUserId(),
-                    'created_at' => new \DateTime(),
-                    'updated_at' => new \DateTime(),
+                    'created_at' => new \DateTime()
+                );
+            }
+
+            if (!$creating && !$foundUpdatedAt && !$foundDeletedAt && !$foundDeletedBy) {
+                $revisions[] = array(
+                    'revisionable_type' => $this->getTable(),
+                    'revisionable_id' => $this->getKey(),
+                    'key' => 'updated_at',
+                    'old_value' => null,
+                    'new_value' => $this->updated_at,
+                    'user_id' => $this->getUserId(),
+                    'created_at' => new \DateTime()
                 );
             }
 
@@ -209,6 +250,8 @@ class Revisionable extends Eloquent
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
             && $this->isRevisionable('deleted_at')) {
+            $revisions = array();
+
             $revisions[] = array(
                 'revisionable_type' => $this->getTable(),
                 'revisionable_id' => $this->getKey(),
@@ -216,8 +259,7 @@ class Revisionable extends Eloquent
                 'old_value' => null,
                 'new_value' => $this->deleted_at,
                 'user_id' => $this->getUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                'created_at' => new \DateTime()
             );
             $revision = new \Gnx\LaravelToolkit\Revision;
             \DB::table($revision->getTable())->insert($revisions);
@@ -228,7 +270,7 @@ class Revisionable extends Eloquent
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
-    private function getUserId()
+    public function getUserId()
     {
         try {
             if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
@@ -238,10 +280,10 @@ class Revisionable extends Eloquent
                 return \Auth::user()->getAuthIdentifier();
             }
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
 
-        return null;
+        return 0;
     }
 
     /**
@@ -299,7 +341,7 @@ class Revisionable extends Eloquent
      *
      * @return bool
      */
-    private function isSoftDelete()
+    public function isSoftDelete()
     {
         // check flag variable used in laravel 4.2+
         if (isset($this->forceDeleting)) {

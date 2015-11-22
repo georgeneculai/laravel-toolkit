@@ -66,6 +66,11 @@ trait RevisionableTrait
     public static function bootRevisionableTrait()
     {
         static::saving(function ($model) {
+            if ($model->exists) {
+                $model->updated_by = $model->getUserId();
+            } else {
+                $model->created_by = $model->getUserId();
+            }
             $model->preSave();
         });
 
@@ -73,8 +78,19 @@ trait RevisionableTrait
             $model->postSave();
         });
 
+        static::creating(function($model){
+            $model->created_by = $model->getUserId();
+        });
+
         static::created(function($model){
             $model->postSave(true);
+        });
+
+        static::deleting(function ($model) {
+            if ($model->isSoftDelete()) {
+                $model->deleted_by = $model->getUserId();
+                $model->save();
+            }
         });
 
         static::deleted(function ($model) {
@@ -101,7 +117,7 @@ trait RevisionableTrait
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
         return \Gnx\LaravelToolkit\Revision::where('revisionable_type', get_called_class())
-            ->orderBy('updated_at', $order)->limit($limit)->get();
+            ->orderBy('created_at', $order)->limit($limit)->get();
     }
 
     /**
@@ -182,10 +198,25 @@ trait RevisionableTrait
             $revisions = array();
 
             $foundCreatedAt = false;
+            $foundUpdatedAt = false;
+            $foundDeletedAt = false;
+            $foundDeletedBy = false;
 
             foreach ($changes_to_record as $key => $change) {
                 if ($key == 'created_at') {
                     $foundCreatedAt = true;
+                }
+
+                if ($key == 'updated_at') {
+                    $foundUpdatedAt = true;
+                }
+
+                if ($key == 'deleted_at') {
+                    $foundDeletedAt = true;
+                }
+
+                if ($key == 'deleted_by') {
+                    $foundDeletedBy = true;
                 }
 
                 $revisions[] = array(
@@ -195,8 +226,7 @@ trait RevisionableTrait
                     'old_value' => $creating ? null : array_get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getUserId(),
-                    'created_at' => new \DateTime(),
-                    'updated_at' => new \DateTime()
+                    'created_at' => new \DateTime()
                 );
             }
 
@@ -208,8 +238,19 @@ trait RevisionableTrait
                     'old_value' => null,
                     'new_value' => $this->created_at,
                     'user_id' => $this->getUserId(),
-                    'created_at' => new \DateTime(),
-                    'updated_at' => new \DateTime(),
+                    'created_at' => new \DateTime()
+                );
+            }
+
+            if (!$creating && !$foundUpdatedAt && !$foundDeletedAt && !$foundDeletedBy) {
+                $revisions[] = array(
+                    'revisionable_type' => $this->getTable(),
+                    'revisionable_id' => $this->getKey(),
+                    'key' => 'updated_at',
+                    'old_value' => null,
+                    'new_value' => $this->updated_at,
+                    'user_id' => $this->getUserId(),
+                    'created_at' => new \DateTime()
                 );
             }
 
@@ -235,6 +276,8 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable('deleted_at')
         ) {
+            $revisions = array();
+
             $revisions[] = array(
                 'revisionable_type' => $this->getTable(),
                 'revisionable_id' => $this->getKey(),
@@ -242,9 +285,9 @@ trait RevisionableTrait
                 'old_value' => null,
                 'new_value' => $this->deleted_at,
                 'user_id' => $this->getUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                'created_at' => new \DateTime()
             );
+
             $revision = new \Gnx\LaravelToolkit\Revision;
             \DB::table($revision->getTable())->insert($revisions);
         }
@@ -254,7 +297,7 @@ trait RevisionableTrait
      * Attempt to find the user id of the currently logged in user
      * Supports Cartalyst Sentry/Sentinel based authentication, as well as stock Auth
      **/
-    private function getUserId()
+    public function getUserId()
     {
         try {
             if (class_exists($class = '\Cartalyst\Sentry\Facades\Laravel\Sentry')
@@ -265,12 +308,10 @@ trait RevisionableTrait
                 return \Auth::user()->getAuthIdentifier();
             }
         } catch (\Exception $e) {
-            return null;
+            return 0;
         }
 
-        // TODO: remove this testing line
-        return 1;
-        return null;
+        return 0;
     }
 
     /**
