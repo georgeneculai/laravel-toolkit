@@ -58,7 +58,7 @@ class ModelCommand extends GeneratorCommand
                 $this->line("<info>Created Migration:</info> $file");
 
                 //$this->call('make:migration', ['name' => "create_{$table}_table", '--create' => $table]);
-                if ($this->option('run-migration') ? $this->option('run-migration') : $this->argument('run-migration')) {
+                if ($this->option('run-migration')) {
                     $this->call('migrate');
                 }
             }
